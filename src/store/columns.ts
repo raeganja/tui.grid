@@ -28,7 +28,6 @@ function getEditorInfo(editor?: string | CellEditorClass, editorOptions?: Dictio
 function createColumn(column: OptColumn, columnOptions: OptColumnOptions): ColumnInfo {
   const {
     header,
-    name,
     width,
     minWidth,
     align,
@@ -36,22 +35,18 @@ function createColumn(column: OptColumn, columnOptions: OptColumnOptions): Colum
     resizable,
     editor,
     editorOptions,
-    renderer,
-    rendererOptions
+    renderer
   } = column;
-  const fixedWidth = typeof width === 'number';
-  const baseWidth = (width === 'auto' ? 0 : width) || 0;
 
   return reactive({
-    name,
-    header: header || name,
+    ...column,
+    header: header || column.name,
     hidden: Boolean(hidden),
     resizable: Boolean(resizable),
     align: align || 'left',
     renderer: renderer || DefaultRenderer,
-    rendererOptions,
-    fixedWidth,
-    baseWidth,
+    fixedWidth: typeof width === 'number',
+    baseWidth: (width === 'auto' ? 0 : width) || 0,
     minWidth: minWidth || columnOptions.minWidth || defMinWidth.COLUMN, // @TODO meta tag 체크 여부
     ...getEditorInfo(editor, editorOptions)
   });

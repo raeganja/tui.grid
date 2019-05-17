@@ -2,35 +2,37 @@ import {
   Data,
   Row,
   Dictionary,
-  CellValue,
   Column,
   ColumnInfo,
   Formatter,
-  CellRenderData
+  CellRenderData,
+  FormatterProps
 } from './types';
 import { reactive, watch, Reactive } from '../helper/reactive';
 import { OptRow } from '../types';
 
-function getFormattedValue(value: CellValue, fn?: Formatter, defValue?: string) {
-  if (typeof fn === 'function') {
-    return fn(value);
+function getFormattedValue(props: FormatterProps, formatter?: Formatter, defValue?: string) {
+  if (typeof formatter === 'function') {
+    return formatter(props);
   }
-  if (typeof fn === 'string') {
-    return fn;
+  if (typeof formatter === 'string') {
+    return formatter;
   }
   return defValue || '';
 }
 
-function createViewCell(value: CellValue, column: ColumnInfo): CellRenderData {
-  const { formatter, prefix, postfix, editor } = column;
+function createViewCell(row: Row, column: ColumnInfo): CellRenderData {
+  const { name, formatter, prefix, postfix, editor } = column;
+  const value = row[name];
+  const formatterProps = { row, column, value };
 
   return {
     // @TODO: change editable/disabled using relations
     editable: !!editor,
     disabled: false,
-    formattedValue: getFormattedValue(value, formatter, String(value)),
-    prefix: getFormattedValue(value, prefix),
-    postfix: getFormattedValue(value, postfix),
+    formattedValue: getFormattedValue(formatterProps, formatter, String(value)),
+    prefix: getFormattedValue(formatterProps, prefix),
+    postfix: getFormattedValue(formatterProps, postfix),
     value
   };
 }
@@ -47,7 +49,7 @@ function createViewRow(row: Row, columnMap: Dictionary<ColumnInfo>) {
 
   Object.keys(columnMap).forEach((name) => {
     watch(() => {
-      valueMap[name] = createViewCell(row[name], columnMap[name]);
+      valueMap[name] = createViewCell(row, columnMap[name]);
     });
   });
 
