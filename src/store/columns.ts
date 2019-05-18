@@ -40,6 +40,7 @@ function createColumn(column: OptColumn, columnOptions: OptColumnOptions): Colum
 
   return reactive({
     ...column,
+    escapeHTML: !!column.escapeHTML,
     header: header || column.name,
     hidden: Boolean(hidden),
     resizable: Boolean(resizable),
@@ -80,6 +81,7 @@ function createRowHeader(data: OptRowHeader): ColumnInfo {
     rendererOptions: baseRendererOptions,
     fixedWidth: true,
     baseWidth,
+    escapeHTML: false,
     minWidth: baseMinWith
   });
 }
